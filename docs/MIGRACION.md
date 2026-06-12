@@ -44,11 +44,13 @@ Jun 2026, después de cerrar el sistema de pistola en Unity, Daniel decidió cam
 | Gore — desmembramiento | **Modelo segmentado pre-cortado** (Opción B): 2 versiones por enemigo |
 | MCP | Empezamos sin. Si hace falta: `chongdashu/unreal-mcp` |
 
-## Qué se reusa del proyecto Unity
-- ✅ Animaciones FPS arms (rig LVA4 en `BlenderWork/LVAA.blend` del Unity)
-- ✅ Modelos 3D propios, audio, texturas (FBX/WAV/PNG directo)
-- ✅ Diseño del juego (`docs/*` copiados acá)
-- ✅ Lista de animaciones en `docs/ANIMACIONES.md` (válida igual para Unreal)
+## Qué se reusa del proyecto Unity (ACTUALIZADO jun 2026)
+- ✅ **Audio completo** — 90 archivos WAV/OGG/MP3 ya migrados a `Content/Audio/` (directo, sin conversión).
+- ✅ **Balance/valores afinados** — extraídos a `docs/BALANCE.md` (vida, daños, hordas, IA). Solo los números; el C# se rehace.
+- ✅ Diseño del juego (`docs/*` copiados acá) + lista de anims (`docs/ANIMACIONES.md`).
+- ❌ **NO se reusan los FBX/rig de Blender** (LVA4). Daniel se desliga de Blender — anims = Mannequin + Mixamo + Fab (ver CLAUDE.md).
+- ❌ **NO se reusan los assets de ThirdParty** (LowPolyShooterPack, GabrielAguiar VFX, Vefects, Low Poly Weapon Series): licenciados de Unity Asset Store. Equivalentes UE = Niagara + Fab.
+- ⚠️ **WeaponSwitch (inventario 1/2/3 + rueda)**: el FPS template de UE NO lo trae (solo pickup de 1 arma). Se construye en Fase 4+; `WeaponSwitch.cs` queda como referencia de diseño (holster 0.4s, slots).
 
 ## Qué se rehace
 - C# → C++ / Blueprints

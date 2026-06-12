@@ -24,7 +24,11 @@ Daniel hace los conceptos nuevos en el editor (Actors, Blueprints, Animation Blu
   - **Path Tracing solo para el trailer**, nunca gameplay.
   - Quality Preset del proyecto = **Scalable** (no Maximum).
 - **Estética**: low poly, voxel gore (sangre cubo), referencias = Ultrakill, DUSK, Selaco, Cultic.
-- **Personajes placeholder**: UE5 Mannequin + anims gratis de **Mixamo** vía **IK Retargeter** (UE 5.4+). Cuando Daniel modele los enemigos finales, retargetear las mismas anims al modelo nuevo (cero re-trabajo).
+- **Animaciones (ACTUALIZADO jun 2026)**: **Cero Blender**. Todo gratuito y fácil de cablear:
+  - Esqueleto base = **UE5 Mannequin** (Manny/Quinn).
+  - Fuentes de anim: **Mixamo** (vía **IK Retargeter**, UE 5.4+) + **Fab/Marketplace** (anim packs nativos UE) + lo que ya trae el FPS template.
+  - **NO se importa** el rig LVA4 ni los FBX de Blender del Unity (`SK_FPSArms_LVA4.fbx`, `SK_Pistol_LVA4.fbx`). Daniel se desliga de Blender.
+  - Cuando se modelen los enemigos finales, retargetear las mismas anims al modelo nuevo (cero re-trabajo).
 - **HUD**: UMG (sistema nativo Unreal).
 - **IA enemigos**: Behavior Trees + Blackboard + NavMesh + AI Perception. Estilo Serious Sam (simple, agresivo, oleadas).
 - **Sombras enemigos**: híbrido por distancia — dynamic shadow cerca, distance field shadow medio, blob shadow / sin sombra lejos.

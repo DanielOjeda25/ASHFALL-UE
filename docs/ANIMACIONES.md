@@ -1,44 +1,49 @@
-# Animaciones — Checklist (viewmodel FPS)
+# Animaciones — Qué necesitamos (fuente: Mixamo + Fab + UE Mannequin)
 
-> Lista viva de animaciones del arma/brazos. Marcamos a medida que avanzamos.
-> Rig: `BlenderWork/LVAA.blend` (LVA4). Export → `Assets/Characters/FPSArms/`.
+> Lista viva de animaciones a conseguir. **Cero Blender** — todo se saca de
+> Mixamo (retarget con IK Retargeter), Fab/Marketplace o el FPS template.
+> Esqueleto base = **UE5 Mannequin**.
 
-## Por ARMA (cada arma necesita su set)
+## Brazos FPS (viewmodel) — por ARMA
+Cada arma necesita su set. El template ya trae varias para el rifle (reusar/retargetear).
 
-| Animación | Qué es | Estado (Pistola) | Prioridad |
+| Animación | Qué es | Prioridad | Nota |
 |---|---|---|---|
-| **Idle** | Quieta, respiración en loop | ✅ `Pistol_Idle` | — |
-| **Draw / Equip** (sacar) | El arma sube al equiparla | 🟡 `Pistol_Draw` (scaffold, pulir) | Alta |
-| **Holster** (guardar) | El arma baja al cambiar | 🟡 `Pistol_Holster` (scaffold, pulir) | Alta |
-| **Fire / Shot** (disparo) | Kick del arma + corredera atrás 1 frame | ❌ falta | **Crítica** |
-| **Reload** | Recarga normal (con cargador) | ✅ `Pistol_Reload` + `Handgun_Reload` | — |
-| **Reload Empty** (sin munición) | Recarga con corredera trabada (rack) | ❌ falta | Alta |
-| **Run / Sprint** | Pose/clip al correr con el arma | ❌ falta (solo idle) | Media |
-| **Inspect** | Revisar el arma (flourish, no funcional) | ❌ falta | Baja |
-| **Aim / ADS** | Apuntar con mira | ❌ falta — ¿lo usamos? (estilo SS no suele) | Opcional |
+| **Idle** | Quieta, respiración en loop | — | El template ya trae `FP_Rifle_Idle` |
+| **Fire / Shot** | Kick + corredera atrás 1 frame | **Crítica** | Sin esto el arma no dispara visualmente |
+| **Reload** | Recarga normal (con cargador) | Alta | |
+| **Reload Empty** | Recarga con corredera trabada | Media | |
+| **Draw / Equip** (sacar) | El arma sube al equiparla | Alta | Para el cambio de armas (Fase 4+) |
+| **Holster** (guardar) | El arma baja al cambiar | Alta | holster 0.4s (ver BALANCE.md) |
+| **Run / Sprint** | Pose al correr con el arma | Media | Template trae `FP_Rifle_Run` |
+| **Jump / Fall / Land** | Manos en el aire | Media | Template trae las del rifle |
+| Inspect | Revisar el arma (flourish) | Baja | |
+| Aim / ADS | Apuntar con mira | Opcional | Estilo Serious Sam no suele usar |
 
-## Compartidas / personaje (desarmado y general)
+## Enemigos (cuerpo completo — Mixamo)
+Sacar de Mixamo y retargetear al esqueleto de cada enemigo. Mismo set sirve para
+todos los humanoides; retargetear una vez por modelo.
 
-| Animación | Qué es | Estado | Prioridad |
-|---|---|---|---|
-| Idle desarmado | Manos vacías, respiración | ✅ `Idle_Unarmed` | — |
-| Run desarmado | Correr | ✅ `Run_Unarmed` | — |
-| Climb (trepar borde) | Subir un borde | ✅ `Climb_Unarmed` | — |
-| Carry Hold / Throw | Sostener / arrojar objeto | ✅ `Carry_Hold` / `Carry_Throw` | — |
-| **Puñetazo** | Golpe desarmado | ❌ falta | Media |
-| **Salto / Caída / Aterrizaje** | Manos en el aire | ❌ falta (cámara ya tiene bob) | Media |
-| Culatazo / Melee con arma | Golpe rápido con el arma equipada | ❌ falta | Baja |
+| Animación | Melee | Kamikaze | Ranged | Tank |
+|---|---|---|---|---|
+| Idle | ✓ | ✓ | ✓ | ✓ |
+| Walk / Run (persecución) | ✓ | ✓ (correr) | ✓ | ✓ (lento) |
+| Attack | swing | — (explota) | dispara | telegrafiado |
+| Hit / Stagger (knockback) | ✓ | ✓ | ✓ | ✓ |
+| Death | (ver gore) | (explota) | ✓ | ✓ |
 
-## Orden sugerido (lo que de verdad mueve la aguja)
-1. **Fire/Shot pistola** — sin esto el arma no dispara visualmente. *Crítica.*
-2. **Reload Empty pistola** — el "sin munición" que ya querías.
-3. **Pulir Draw/Holster** — las poses de mano (ahora solo suben/bajan).
-4. **Run con pistola** — para que no quede en idle al correr.
-5. De ahí: repetir el set para la **2ª arma**, y las compartidas (puñetazo, salto).
+> **Muerte + gore**: el desmembramiento NO es una animación — se resuelve por física
+> (ragdoll / chunks con impulso) + Niagara de sangre voxel. Ver decisión en CLAUDE.md.
 
-## Notas de pipeline (no olvidar al exportar)
-- **30 fps** la escena (no 24).
-- Animar partes del arma como **objetos** (slide/mag), no huesos — OK.
-- **Visibilidad** (mostrar/ocultar piezas): usar **escala 0/1**, NO `hide_viewport` (el hide no se exporta a FBX).
-- **Nada de puntos** en nombres de objetos (rompe el FBX).
-- **No animar el hueso `root`** para movimiento visible (Unity lo trata como root motion y lo descarta con `applyRootMotion=false`) — mover huesos hijos.
+## Orden sugerido (lo que mueve la aguja)
+1. **Fire pistola** — sin esto no hay disparo visual. *Crítica.*
+2. **Reload pistola** (normal + empty).
+3. **Draw/Holster** — para el cambio de armas.
+4. **Set del primer enemigo melee** (idle, run, attack, hit) desde Mixamo.
+
+## Pipeline en Unreal (reemplaza el viejo de Blender)
+- **Mixamo → UE**: descargar FBX sin skin → importar → **IK Retargeter** del esqueleto
+  Mixamo al UE Mannequin → exportar las anims retargeteadas.
+- **Animation Blueprint** (State Machine) maneja las transiciones idle/run/jump.
+- **Fire** se dispara como **AnimMontage** (como ya hace el template en `Fire()`).
+- Eventos de animación (notifies) para sincronizar sonido de recarga (mag_in/out, slide).
