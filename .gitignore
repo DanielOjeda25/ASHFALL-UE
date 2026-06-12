@@ -92,3 +92,6 @@ UpgradeLog.htm
 # OS specific files
 Thumbs.db
 .DS_Store
+
+# MCP — ruta del server Python es específica de cada PC (ver docs/MCP.md para reconfigurar)
+.mcp.json

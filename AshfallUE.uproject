@@ -17,10 +17,14 @@
     },
     {
       "Name": "VisualStudioTools",
-      "Enabled": true,
+      "Enabled": false,
       "SupportedTargetPlatforms": [
         "Win64"
       ]
+    },
+    {
+      "Name": "UnrealMCP",
+      "Enabled": true
     }
   ],
   "TargetPlatforms": [],
