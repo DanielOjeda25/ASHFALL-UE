@@ -5,8 +5,9 @@
 ## Qué es esto
 **ASHFALL** — horde shooter sci-fi decadente, estilo **Serious Sam** (hordas masivas + mapas grandes + low poly) en **Unreal Engine 5.5**. Migración desde ASHFALL Unity (jun 2026) por mejor stack visual y motor más robusto. **El diseño del juego no cambia** — sigue los specs de `docs/VISION.md`, `docs/ROADMAP.md`, `docs/MAPA_FUNDICION.md`.
 
-## Estado actual
-**Recién inicializado.** Proyecto creado desde el FPS template de UE 5.5 (C++, Scalable preset, sin Lumen). Setup mínimo: `.gitignore`, `.gitattributes` con LFS, docs migrados desde Unity. Fase 1 del plan.
+## Estado actual (actualizado jun 2026)
+Vertical slice en marcha. Hecho: setup + Git/LFS, **runreal MCP** (Python en editor), audio migrado, **gore sangre voxel enganchado al impacto**, **horda de enemigos Mannequin** (3 tipos melee/kamikaze/tank con velocidad+color, IA persecución + NavMesh), **sprint del jugador** (C++), **arena greybox** naranja de pruebas, y **migrado un mega sample** (armas Military Weapons + animaciones Lyra/ALS/GASP) para Fases 6-7.
+Pendiente cercano: **perspectiva toggle 1ra/3ra (Serious Sam)** + **sistema de armas** (Fase 7) + **loop de combate** (enemigos atacan/mueren).
 
 ## Método de trabajo (IMPORTANTE)
 Daniel está **aprendiendo Unreal Engine** (viene de Unity). Por cada paso, el agente debe dar:
@@ -24,11 +25,13 @@ Daniel hace los conceptos nuevos en el editor (Actors, Blueprints, Animation Blu
   - **Path Tracing solo para el trailer**, nunca gameplay.
   - Quality Preset del proyecto = **Scalable** (no Maximum).
 - **Estética**: low poly, voxel gore (sangre cubo), referencias = Ultrakill, DUSK, Selaco, Cultic.
-- **Animaciones (ACTUALIZADO jun 2026)**: **Cero Blender**. Todo gratuito y fácil de cablear:
-  - Esqueleto base = **UE5 Mannequin** (Manny/Quinn).
-  - Fuentes de anim: **Mixamo** (vía **IK Retargeter**, UE 5.4+) + **Fab/Marketplace** (anim packs nativos UE) + lo que ya trae el FPS template.
-  - **NO se importa** el rig LVA4 ni los FBX de Blender del Unity (`SK_FPSArms_LVA4.fbx`, `SK_Pistol_LVA4.fbx`). Daniel se desliga de Blender.
-  - Cuando se modelen los enemigos finales, retargetear las mismas anims al modelo nuevo (cero re-trabajo).
+- **Perspectiva (DECISIÓN jun 2026): toggle 1ra/3ra persona** estilo Serious Sam (una tecla alterna). Implica **cuerpo completo visible** (no solo brazos `Mesh1P`): cámara en spring arm que va de la cabeza (1ra) a detrás (3ra), y el cuerpo `SKM_Manny` se ve en 3ra. Las armas se attachean al cuerpo. Esto revaloriza el mega sample (los montages Lyra animan el **cuerpo entero** disparando/recargando → perfecto para 3ra).
+- **Animaciones (ACTUALIZADO jun 2026)**: **Cero Blender**. Todo gratuito y nativo UE:
+  - Esqueleto base = **UE5 Mannequin** (Manny/Quinn), **cuerpo completo** (por el toggle 1ra/3ra).
+  - **Locomoción = GASP** (Game Animation Sample, motion-matching) — migrado del mega sample. Reemplaza/mejora `ABP_Manny` para que el cuerpo se vea AAA en 3ra persona.
+  - **Anims de arma = montages Lyra** (`AM_MM_Pistol/Rifle/Shotgun_Fire/Reload/Equip`) — migrados, sobre esqueleto Manny.
+  - Fuentes extra: **Mixamo** (vía **IK Retargeter** + `RTG_Mannequin` del pack) para anims puntuales (ataques enemigos, etc.).
+  - **NO se importa** el rig LVA4 ni FBX de Blender del Unity. Daniel se desligó de Blender.
 - **HUD**: UMG (sistema nativo Unreal).
 - **IA enemigos**: Behavior Trees + Blackboard + NavMesh + AI Perception. Estilo Serious Sam (simple, agresivo, oleadas).
 - **Sombras enemigos**: híbrido por distancia — dynamic shadow cerca, distance field shadow medio, blob shadow / sin sombra lejos.
@@ -57,6 +60,14 @@ Daniel hace los conceptos nuevos en el editor (Actors, Blueprints, Animation Blu
 - **Ranged** (futuro): detecta → cobertura → dispara → reposiciona
 - **Tanque** (futuro): detecta → camina lento → telegrafiar ataque
 
+## Assets externos migrados (mega sample, jun 2026)
+Un proyecto UE sample (`ProjectMegaSample/`, **gitignored** — solo fuente, no se commitea) del que se extrajo a `Content/`:
+- ✅ **Armas** (`_WeaponsPacks/`): Military Weapons Dark+Silver → **Pistols**, **Shotgun**, **Assault Rifle** (= pistola/escopeta/rifle), + sniper/lanzacohetes/lanzagranadas/cuchillo. 2 skins.
+- ✅ **Animaciones** (`_AnimationLibrary/`): montages **Lyra** (fire/reload/equip por arma) + poses **ALS** + locomoción **GASP** (motion-matching).
+- ✅ Soporte de anim: `Blueprints/` (AnimNotifies foley + AnimModifiers) + `Audio/Foley` + `Audio/Mix`.
+- Todo en ecosistema Epic/UE (licencia libre) → sin el problema de los assets atados a Unity Asset Store.
+- ⚠️ Migrado por filesystem (runreal estaba caído); verificar refs al esqueleto Manny al abrir; re-Migrar puntual si algo sale roto.
+
 ## Qué se reusa del proyecto Unity (actualizado jun 2026)
 - ✅ **Audio completo** (90 archivos WAV/OGG/MP3 en `Content/Audio/`).
 - ✅ **Balance/valores afinados** — extraídos a `docs/BALANCE.md` (vida, daños, hordas, IA). Solo los números, el C# se rehace.
@@ -73,19 +84,23 @@ Daniel hace los conceptos nuevos en el editor (Actors, Blueprints, Animation Blu
 
 ## Plan de fases (orden — actualizado jun 2026)
 1. ✅ Setup proyecto + Git + LFS + GitHub
-2. ✅ **MCP de Unreal instalado** (`chongdashu/unreal-mcp` en `Plugins/UnrealMCP/`).
-3. ✅ **Audio migrado** del Unity (`Content/Audio/`) + balance extraído (`docs/BALANCE.md`).
-4. 🟡 **Gore — sangre voxel**: `NS_BloodVoxel` prototipado (Niagara). Pendiente terminarlo y enganchar al daño.
-5. 🟡 **Gore — desmembramiento**: prototipo con Chaos en curso.
-6. ⬜ Visual del personaje FPS (Mannequin + Mixamo, sin Blender).
-7. ⬜ Primera arma (Pistola) con `BP_Weapon_Base` + `WeaponData` (UDataAsset).
-8. ⬜ Enemigos (melee + kamikaze) con Behavior Tree.
+2. ✅ **MCP de Unreal**: `chongdashu` (`unreal`) + **`runreal`** (Python arbitrario, el que usamos). Ver memorias.
+3. ✅ **Audio migrado** del Unity + balance extraído (`docs/BALANCE.md`).
+4. ✅ **Gore — sangre voxel**: `NS_BloodVoxel` (color/escala/burst/colisión) **enganchado al impacto en enemigos** (tag `Enemy` en `BP_FirstPersonProjectile`).
+5. 🟡 **Gore — desmembramiento**: prototipo con Chaos (`BP_GoreChunk`), pendiente integrar.
+6. 🟡 **Personaje + perspectiva**: cuerpo completo Mannequin + **cámara toggle 1ra/3ra (Serious Sam)** + **GASP** (locomoción). Sprint (Shift) ✅ ya hecho.
+7. ⬜ **Sistema de armas**: `BP_Weapon_Base` + `WeaponData` (UDataAsset), usando armas migradas (pistola/escopeta/rifle) + montages Lyra. Inventario 1/2/3.
+8. 🟡 **Enemigos**: 3 tipos (melee/kamikaze/tank) con velocidad+color e IA persecución (`MoveTo` simple + NavMesh) ✅. Falta **Behavior Tree + ataque + vida/muerte** (loop de combate).
 9. ⬜ Hordas + WaveSystem.
 10. ⬜ HUD UMG + audio adaptativo.
-11. ⬜ Mapa La Fundición.
+11. ⬜ Mapa La Fundición (la arena actual es greybox de pruebas, prefijo `AF_Arena_`).
 
 ## MCP / Automatización (actualizado jun 2026)
-**MCP instalado y funcionando**: `chongdashu/unreal-mcp` en `Plugins/UnrealMCP/`. Server Python aparte; la ruta al server vive en `.mcp.json` (ignorado por gitignore, **es por-PC** — re-configurar en cada máquina, ver `docs/MCP.md`). Unreal también tiene Python nativo (`Window → Python Console`) para snippets puntuales.
+Dos MCP de Unreal en `.mcp.json` (gitignored, **por-PC**):
+- **`runreal`** (el que usamos para todo): expone `editor_run_python` (Python arbitrario en el editor). Instalado **global** (`npm i -g @runreal/unreal-mcp`) y el `.mcp.json` lo llama con `node <ruta>/dist/bin.js` (NO `npx` — el npx no spawneaba). Si reiniciás el editor, **cerrá+abrí Claude Code** para que reconecte (el Node no se auto-respawnea; ver [[mcp-unreal-runreal]]).
+- **`unreal`** (chongdashu): plugin C++, limitado (sin Python). Backup.
+- **Niagara interno** = punto ciego de ambos → se edita a mano en el editor.
+- Unreal tiene Python nativo (`Window → Python Console`) para snippets.
 
 ## Notas técnicas críticas
 - **Git LFS obligatorio** para `.uasset`, `.umap`, FBX, WAV, PNG grandes. Sin LFS el repo crece descontroladamente.
