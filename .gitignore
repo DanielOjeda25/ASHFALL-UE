@@ -95,3 +95,7 @@ Thumbs.db
 
 # MCP — ruta del server Python es específica de cada PC (ver docs/MCP.md para reconfigurar)
 .mcp.json
+
+# Proyectos sample / packs de referencia y descargas (no son contenido del juego)
+/ProjectMegaSample/
+*.zip
