@@ -34,13 +34,13 @@ Daniel hace los conceptos nuevos en el editor (Actors, Blueprints, Animation Blu
 - **Sombras enemigos**: híbrido por distancia — dynamic shadow cerca, distance field shadow medio, blob shadow / sin sombra lejos.
 - **Sistema de armas**: BP_Weapon_Base + UDataAsset (WeaponData) — data-driven. Inventario 1/2/3 + rueda.
 
-## Gore (decisión Daniel)
-- **Sangre**: Niagara System. Cubos voxel con física que rebotan, forman charcos, fade. Replicar look del proyecto Unity (no la lógica — la lógica se rehace).
-- **Desmembramiento — OPCIÓN B (modelo segmentado pre-cortado)**:
-  - Daniel modela 2 versiones por enemigo en Blender: vivo (SkeletalMesh) + muerto (6-8 StaticMesh con cortes en articulaciones).
-  - Al morir: BP "Enemigo_Desmembrado" reemplaza al vivo. Cada pedazo con rigidbody + collider + Niagara de sangre desde el muñón.
-  - Variantes de muerte: bala (cabeza vuela), explosión (8 pedazos volando), melee (corte vertical), sangrado (entero + charco).
-- **NO usar**: cortes procedurales (overkill para low poly).
+## Gore (decisión Daniel — actualizado jun 2026)
+- **Sangre**: Niagara System `NS_BloodVoxel` (ya prototipado). Cubos voxel con física que rebotan, forman charcos, fade. Replica el look del proyecto Unity.
+- **Desmembramiento — CON CHAOS (física de Unreal)**:
+  - Se usa el sistema **Chaos Destruction / Chaos Flesh** de UE — más simple y nativo, sin pre-modelar piezas.
+  - Al morir: ragdoll + fractura por física. Variantes de muerte (bala / explosión / melee) según fuerza/punto de impacto.
+  - **Descartado**: modelo segmentado pre-cortado (Opción B antigua) — Daniel se desligó de Blender, así que pre-modelar piezas no encaja con el flujo nuevo.
+- **NO usar**: cortes procedurales geométricos (mesh slicing) — overkill para low poly.
 
 ## Las 3 armas iniciales (planificadas)
 | | Pistola | Escopeta | Rifle |
@@ -57,11 +57,12 @@ Daniel hace los conceptos nuevos en el editor (Actors, Blueprints, Animation Blu
 - **Ranged** (futuro): detecta → cobertura → dispara → reposiciona
 - **Tanque** (futuro): detecta → camina lento → telegrafiar ataque
 
-## Qué se reusa del proyecto Unity (ASHFALL anterior)
-- ✅ Animaciones FPS arms (Blender, rig LVA4) — FBX directo
-- ✅ Modelos 3D, audio (WAV/OGG), texturas
-- ✅ Spec del juego (los `docs/*` están copiados acá)
-- ✅ Lista de animaciones (docs/ANIMACIONES.md)
+## Qué se reusa del proyecto Unity (actualizado jun 2026)
+- ✅ **Audio completo** (90 archivos WAV/OGG/MP3 en `Content/Audio/`).
+- ✅ **Balance/valores afinados** — extraídos a `docs/BALANCE.md` (vida, daños, hordas, IA). Solo los números, el C# se rehace.
+- ✅ Spec del juego (`docs/VISION`, `ROADMAP`, `MAPA_FUNDICION`) + `docs/ANIMACIONES.md` como referencia de lista.
+- ❌ **NO se reusan los FBX/rig LVA4 de Blender**. Daniel se desligó de Blender — anims = UE5 Mannequin + Mixamo + Fab.
+- ❌ **NO se reusa ThirdParty del Unity** (LowPolyShooterPack, GabrielAguiar VFX, Vefects, Low Poly Weapon Series): licencias atadas a Unity Asset Store. Equivalentes UE = Niagara + Fab.
 
 ## Qué se rehace (no se migra)
 - Scripts C# → **C++ / Blueprints**
@@ -70,18 +71,21 @@ Daniel hace los conceptos nuevos en el editor (Actors, Blueprints, Animation Blu
 - HUD (UI Toolkit) → **UMG**
 - Sistema de armas/enemigos/hordas → reimplementado en Unreal
 
-## Plan de fases (orden)
+## Plan de fases (orden — actualizado jun 2026)
 1. ✅ Setup proyecto + Git + LFS + GitHub
-2. 🟡 **Familiarización con el editor** (Daniel explora UE 5.5 + FPS template)
-3. ⬜ Migrar visual del personaje (FPS arms LVA4 desde Blender)
-4. ⬜ Re-implementar disparo sobre el FPS template (primera arma: pistola)
-5. ⬜ Enemigos (melee + kamikaze)
-6. ⬜ Hordas + WaveSystem
-7. ⬜ HUD + audio adaptativo
-8. ⬜ Mapa La Fundición
+2. ✅ **MCP de Unreal instalado** (`chongdashu/unreal-mcp` en `Plugins/UnrealMCP/`).
+3. ✅ **Audio migrado** del Unity (`Content/Audio/`) + balance extraído (`docs/BALANCE.md`).
+4. 🟡 **Gore — sangre voxel**: `NS_BloodVoxel` prototipado (Niagara). Pendiente terminarlo y enganchar al daño.
+5. 🟡 **Gore — desmembramiento**: prototipo con Chaos en curso.
+6. ⬜ Visual del personaje FPS (Mannequin + Mixamo, sin Blender).
+7. ⬜ Primera arma (Pistola) con `BP_Weapon_Base` + `WeaponData` (UDataAsset).
+8. ⬜ Enemigos (melee + kamikaze) con Behavior Tree.
+9. ⬜ Hordas + WaveSystem.
+10. ⬜ HUD UMG + audio adaptativo.
+11. ⬜ Mapa La Fundición.
 
-## MCP / Automatización
-**Arrancamos SIN MCP**. Unreal tiene Python nativo en el editor (`Window → Python Console`), suficiente para snippets puntuales. Cuando haga falta más (revisar estado de la escena, hordas masivas), instalar **[chongdashu/unreal-mcp](https://github.com/chongdashu/unreal-mcp)** (UE 5.5 oficial, 2k stars).
+## MCP / Automatización (actualizado jun 2026)
+**MCP instalado y funcionando**: `chongdashu/unreal-mcp` en `Plugins/UnrealMCP/`. Server Python aparte; la ruta al server vive en `.mcp.json` (ignorado por gitignore, **es por-PC** — re-configurar en cada máquina, ver `docs/MCP.md`). Unreal también tiene Python nativo (`Window → Python Console`) para snippets puntuales.
 
 ## Notas técnicas críticas
 - **Git LFS obligatorio** para `.uasset`, `.umap`, FBX, WAV, PNG grandes. Sin LFS el repo crece descontroladamente.
