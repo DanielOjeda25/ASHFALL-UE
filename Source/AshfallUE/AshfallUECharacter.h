@@ -44,7 +44,19 @@ class AAshfallUECharacter : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
-	
+
+	/** Sprint Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SprintAction;
+
+	/** Velocidad al caminar (cm/s) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float WalkSpeed = 600.f;
+
+	/** Velocidad al esprintar (cm/s) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float SprintSpeed = 950.f;
+
 public:
 	AAshfallUECharacter();
 
@@ -54,6 +66,12 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	/** Empieza a esprintar (Shift presionado) */
+	void StartSprint();
+
+	/** Deja de esprintar (Shift soltado) */
+	void StopSprint();
 
 protected:
 	// APawn interface

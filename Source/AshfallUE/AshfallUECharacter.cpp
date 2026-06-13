@@ -9,7 +9,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "InputAction.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -35,6 +38,15 @@ AAshfallUECharacter::AAshfallUECharacter()
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	// Velocidad base de caminata
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+	// Carga el Input Action de sprint por codigo (sin asignarlo en el Blueprint)
+	static ConstructorHelpers::FObjectFinder<UInputAction> SprintActionFinder(TEXT("/Game/FirstPerson/Input/Actions/IA_Sprint.IA_Sprint"));
+	if (SprintActionFinder.Succeeded())
+	{
+		SprintAction = SprintActionFinder.Object;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -67,6 +79,13 @@ void AAshfallUECharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAshfallUECharacter::Look);
+
+		// Sprint (Shift)
+		if (SprintAction)
+		{
+			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AAshfallUECharacter::StartSprint);
+			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AAshfallUECharacter::StopSprint);
+		}
 	}
 	else
 	{
@@ -99,4 +118,14 @@ void AAshfallUECharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AAshfallUECharacter::StartSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+}
+
+void AAshfallUECharacter::StopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
