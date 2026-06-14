@@ -10,6 +10,7 @@
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
+class USpringArmComponent;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
@@ -28,6 +29,14 @@ class AAshfallUECharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
+
+	/** Brazo (spring arm) para la cámara de 3ra persona */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* ThirdPersonSpringArm;
+
+	/** Cámara de 3ra persona (detrás del cuerpo) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* ThirdPersonCameraComponent;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -48,6 +57,14 @@ class AAshfallUECharacter : public ACharacter
 	/** Sprint Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SprintAction;
+
+	/** Toggle 1ra/3ra persona Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ToggleViewAction;
+
+	/** ¿Está en 3ra persona ahora? */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	bool bIsThirdPerson = false;
 
 	/** Velocidad al caminar (cm/s) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
@@ -72,6 +89,12 @@ protected:
 
 	/** Deja de esprintar (Shift soltado) */
 	void StopSprint();
+
+	/** Alterna entre 1ra y 3ra persona (estilo Serious Sam) */
+	void ToggleView();
+
+	/** Aplica el estado de cámara/mallas según bIsThirdPerson */
+	void ApplyViewMode();
 
 protected:
 	// APawn interface
