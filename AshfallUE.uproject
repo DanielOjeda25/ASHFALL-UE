@@ -45,6 +45,14 @@
     {
       "Name": "Chooser",
       "Enabled": true
+    },
+    {
+      "Name": "Mover",
+      "Enabled": true
+    },
+    {
+      "Name": "NetworkPrediction",
+      "Enabled": true
     }
   ],
   "TargetPlatforms": [],
